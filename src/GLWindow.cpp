@@ -4,6 +4,30 @@
 #include <GL/glew.h>
 #include "GLWindow.h"
 
+extern const char *vertex_shader_code;
+extern const char *fragment_shader_code;
+
+void installShaders() {
+    GLuint vertex_shader_id = glCreateShader(GL_VERTEX_SHADER);
+    GLuint fragment_shader_id = glCreateShader(GL_FRAGMENT_SHADER);
+
+    const char *adapter[1];
+    adapter[0] = vertex_shader_code;
+    glShaderSource(vertex_shader_id, 1, adapter, 0);
+    adapter[0] = fragment_shader_code;
+    glShaderSource(fragment_shader_id, 1, adapter, 0);
+
+    glCompileShader(vertex_shader_id);
+    glCompileShader(fragment_shader_id);
+
+    GLuint program_id = glCreateProgram();
+    glAttachShader(program_id, vertex_shader_id);
+    glAttachShader(program_id, fragment_shader_id);
+    glLinkProgram(program_id);
+
+    glUseProgram(program_id);
+}
+
 void GLWindow::initializeGL() {
     glewInit();
 
@@ -52,6 +76,8 @@ void GLWindow::initializeGL() {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_buffer_id);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices),
             indices, GL_STATIC_DRAW);
+
+    installShaders();
 }
 
 void GLWindow::paintGL() {
