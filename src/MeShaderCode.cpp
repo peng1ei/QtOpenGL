@@ -2,6 +2,7 @@
 // Created by penglei on 18-12-22.
 //
 
+// 有多少个 vertex，就执行多少次
 const char *vertex_shader_code = {
         "#version 430\r\n"
         ""
@@ -17,6 +18,7 @@ const char *vertex_shader_code = {
         "}"
 };
 
+// 有多少个 fragment/pixels 就执行多少次
 const char *fragment_shader_code = {
         "#version 430\r\n"
         ""
