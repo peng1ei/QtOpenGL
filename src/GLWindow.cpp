@@ -8,23 +8,71 @@
 extern const char *vertex_shader_code;
 extern const char *fragment_shader_code;
 
-bool checkShaderStatus(GLuint shader_id) {
-    GLint compile_status;
-    glGetShaderiv(shader_id, GL_COMPILE_STATUS, &compile_status);
-    if (compile_status != GL_TRUE) {
+// 将 GLSL 的编译和链接 状态检查重构为一个函数
+bool checkStatus(
+        GLuint object_id,
+        PFNGLGETSHADERIVPROC object_property_Getter_func,
+        PFNGLGETSHADERINFOLOGPROC get_info_log_func,
+        GLenum e_status_type) {
+    GLint status;
+    object_property_Getter_func(object_id, e_status_type, &status);
+    if (status != GL_TRUE) {
         GLint info_log_length;
-        glGetShaderiv(shader_id, GL_INFO_LOG_LENGTH, &info_log_length);
+        object_property_Getter_func(object_id, GL_INFO_LOG_LENGTH, &info_log_length);
         GLchar *buffer = new GLchar[info_log_length];
 
         GLsizei buffer_size;
-        glGetShaderInfoLog(shader_id, info_log_length, &buffer_size, buffer);
-        std::cout << "Compile Shader Failed -- " << buffer << std::endl;
+        get_info_log_func(object_id, info_log_length, &buffer_size, buffer);
+        std::cout << buffer << std::endl;
 
         delete []buffer;
         return false;
     }
 
     return true;
+}
+
+bool checkShaderStatus(GLuint shader_id) {
+//    GLint compile_status;
+//    glGetShaderiv(shader_id, GL_COMPILE_STATUS, &compile_status);
+//    if (compile_status != GL_TRUE) {
+//        GLint info_log_length;
+//        glGetShaderiv(shader_id, GL_INFO_LOG_LENGTH, &info_log_length);
+//        GLchar *buffer = new GLchar[info_log_length];
+//
+//        GLsizei buffer_size;
+//        glGetShaderInfoLog(shader_id, info_log_length, &buffer_size, buffer);
+//        std::cout << "Compile Shader Failed -- " << buffer << std::endl;
+//
+//        delete []buffer;
+//        return false;
+//    }
+//
+//    return true;
+    return checkStatus(shader_id, glGetShaderiv,
+            glGetShaderInfoLog, GL_COMPILE_STATUS);
+}
+
+bool checkProgramStatus(GLuint program_id) {
+//    GLint link_status;
+//    glGetShaderiv(program_id, GL_LINK_STATUS, &link_status);
+//    if (link_status != GL_TRUE) {
+//        GLint info_log_length;
+//        glGetProgramiv(program_id, GL_INFO_LOG_LENGTH, &info_log_length);
+//        GLchar *buffer = new GLchar[info_log_length];
+//
+//        GLsizei buffer_size;
+//        glGetProgramInfoLog(program_id, info_log_length, &buffer_size, buffer);
+//        std::cout << "Program Link Failed -- " << buffer << std::endl;
+//
+//        delete []buffer;
+//        return false;
+//    }
+//
+//    return true;
+
+    return checkStatus(program_id, glGetProgramiv,
+            glGetProgramInfoLog, GL_LINK_STATUS);
 }
 
 void installShaders() {
@@ -48,6 +96,9 @@ void installShaders() {
     glAttachShader(program_id, vertex_shader_id);
     glAttachShader(program_id, fragment_shader_id);
     glLinkProgram(program_id);
+
+    if (!checkProgramStatus(program_id))
+        return;
 
     glUseProgram(program_id);
 }
