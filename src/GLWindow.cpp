@@ -11,19 +11,17 @@ void GLWindow::initializeGL() {
         +0.0f, +0.0f,
         +1.0f, +1.0f,
         -1.0f, +1.0f,
-
-        +0.0f, +0.0f,
         -1.0f, -1.0f,
         +1.0f, -1.0f,
     };
 
     // 创建一个 buffer object
-    GLuint my_buffer_id;
-    glGenBuffers(1, &my_buffer_id);
+    GLuint vertex_buffer_id;
+    glGenBuffers(1, &vertex_buffer_id);
 
     // 将 buffer object 暂时绑定到 OpenGL Context
     // 因为只有这样才能修改和使用 object
-    glBindBuffer(GL_ARRAY_BUFFER, my_buffer_id);
+    glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer_id);
 
     // 将 CPU 中的数据传给 GPU
     glBufferData(GL_ARRAY_BUFFER, sizeof(verts),
@@ -34,6 +32,18 @@ void GLWindow::initializeGL() {
 
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
+
+    // 用顶点索引缓冲对象
+    GLushort indices[] = {
+            0, 1, 2,
+            0, 3, 4,
+    };
+
+    GLuint index_buffer_id;
+    glGenBuffers(1, &index_buffer_id);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_buffer_id);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices),
+            indices, GL_STATIC_DRAW);
 }
 
 void GLWindow::paintGL() {
@@ -42,6 +52,7 @@ void GLWindow::paintGL() {
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    glDrawArrays(GL_TRIANGLES, 0, 6);
+    //glDrawArrays(GL_TRIANGLES, 0, 6);
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0);
 
 }
