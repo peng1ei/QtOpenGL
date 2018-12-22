@@ -8,9 +8,13 @@ void GLWindow::initializeGL() {
     glewInit();
 
     GLfloat verts[] {
-        +0.0f, +1.0f, 0.0f,
-        -1.0f, -1.0f, 0.0f,
-        +1.0f, -1.0f, 0.0f,
+        +0.0f, +0.0f,
+        +1.0f, +1.0f,
+        -1.0f, +1.0f,
+
+        +0.0f, +0.0f,
+        -1.0f, -1.0f,
+        +1.0f, -1.0f,
     };
 
     // 创建一个 buffer object
@@ -29,7 +33,7 @@ void GLWindow::initializeGL() {
     //glBindBuffer(GL_ARRAY_BUFFER, 0);
 
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
 }
 
 void GLWindow::paintGL() {
@@ -38,6 +42,6 @@ void GLWindow::paintGL() {
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    glDrawArrays(GL_TRIANGLES, 0, 3);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
 
 }
