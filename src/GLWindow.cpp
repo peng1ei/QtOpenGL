@@ -2,16 +2,36 @@
 // Created by penglei on 18-12-21.
 //
 #include <GL/glew.h>
+#include <iostream>
 #include "GLWindow.h"
 
 extern const char *vertex_shader_code;
 extern const char *fragment_shader_code;
 
+bool checkShaderStatus(GLuint shader_id) {
+    GLint compile_status;
+    glGetShaderiv(shader_id, GL_COMPILE_STATUS, &compile_status);
+    if (compile_status != GL_TRUE) {
+        GLint info_log_length;
+        glGetShaderiv(shader_id, GL_INFO_LOG_LENGTH, &info_log_length);
+        GLchar *buffer = new GLchar[info_log_length];
+
+        GLsizei buffer_size;
+        glGetShaderInfoLog(shader_id, info_log_length, &buffer_size, buffer);
+        std::cout << "Compile Shader Failed -- " << buffer << std::endl;
+
+        delete []buffer;
+        return false;
+    }
+
+    return true;
+}
+
 void installShaders() {
     GLuint vertex_shader_id = glCreateShader(GL_VERTEX_SHADER);
     GLuint fragment_shader_id = glCreateShader(GL_FRAGMENT_SHADER);
 
-    const char *adapter[1];
+    const GLchar *adapter[1];
     adapter[0] = vertex_shader_code;
     glShaderSource(vertex_shader_id, 1, adapter, 0);
     adapter[0] = fragment_shader_code;
@@ -19,6 +39,10 @@ void installShaders() {
 
     glCompileShader(vertex_shader_id);
     glCompileShader(fragment_shader_id);
+
+    if (!checkShaderStatus(vertex_shader_id) ||
+        ! checkShaderStatus(fragment_shader_id))
+        return;
 
     GLuint program_id = glCreateProgram();
     glAttachShader(program_id, vertex_shader_id);
